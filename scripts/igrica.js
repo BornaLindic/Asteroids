@@ -1,46 +1,69 @@
+var gameActive = false
 var player;
-var asteroids = []
-const asteroidFrequency = 500; // milliseconds
+var startTimestamp = new Date()
+var asteroids
+var startNumAsteroids;
+var asteroidFrequency;
 const asteroidLifeSpan = 30_000;
 var lastAsteroidSpawn = new Date().getTime();
 var windowWidth = window.innerWidth-30
-var windowHeight = window.innerHeight-30
+var windowHeight = window.innerHeight-50
+
+if (!localStorage.highScore) {
+    localStorage.highScore = 0
+}
 
 // Keyboard input handling
 var keyState;
-
 window.addEventListener("keydown", (e) => {
-    keyState = e.key;
+    console.log(e.key)
+    if (e.key == "ArrowUp" ||
+            e.key == "ArrowDown" ||
+            e.key == "ArrowRight" ||
+            e.key == "ArrowLeft") {
+        keyState = e.key;
+        if (!gameActive) {
+            startGame()
+            gameActive = true
+        }
+    }
 });
 
-window.addEventListener("keyup", (e) => {
-    keyState = e.key;
-});
 
-window.addEventListener("keyright", (e) => {
-    keyState = e.key;
-});
-
-window.addEventListener("keyleft", (e) => {
-    keyState = e.key;
-});
+function mainMenuScreen() {
+    myGameArea.setCanvas();
+    ctx = myGameArea.context;
+    ctx.font = "20px Georgia";
+    ctx.fillText("Za pokretanje igre pritisnike neku od strelica.", windowWidth/2-200, windowHeight/2)
+}
 
 
 function startGame() {
+    startNumAsteroids = document.getElementById('pocetniBrojAsteroida').value
+    asteroidFrequency = document.getElementById("frekvenicijaAsteroida").value
+    
+    asteroids = []
+    for (let i = 0; i < startNumAsteroids; i++) {
+        asteroids.push(new asteroid)
+    }
+    myGameArea.context.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
     player = new player(30, 30, "red", windowWidth/2, windowHeight/2);
     myGameArea.start();
 }
 
 var myGameArea = {
     canvas: document.createElement("canvas"),
-    start: function () {
+    setCanvas: function () {
         this.canvas.id = "myGameCanvas";
         this.canvas.width = windowWidth;
         this.canvas.height = windowHeight;
         this.context = this.canvas.getContext("2d");
-        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        document.body.insertBefore(this.canvas, document.body.childNodes[document.body.childNodes.length-1])},
+    start: function () {
         this.frameNo = 0;
-        this.interval = setInterval(updateGameArea, 20);
+        if (!gameActive) {
+            this.interval = setInterval(updateGameArea, 20);
+        }
     },
     stop: function () {
         clearInterval(this.interval);
@@ -62,6 +85,8 @@ function player(width, height, color, x, y, type) {
     this.update = function () {
         ctx = myGameArea.context;
         ctx.save();
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "black";
         ctx.translate(this.x, this.y);
         ctx.fillStyle = color;
         ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
@@ -89,7 +114,7 @@ function player(width, height, color, x, y, type) {
 
 
 function asteroid() {
-    this.color = "black"
+    this.color = "grey"
 
     this.width = Math.random() * (150 - 20) + 20;
     this.height = this.width;
@@ -122,6 +147,8 @@ function asteroid() {
     this.update = function () {
         ctx = myGameArea.context;
         ctx.save();
+        ctx.shadowBlur = 20;
+        ctx.shadowColor = "black";
         ctx.translate(this.x, this.y);
         ctx.fillStyle = this.color;
         ctx.fillRect(this.width / -2, this.height / -2, this.width, this.height);
@@ -185,9 +212,40 @@ function checkCollisions() {
             player.y + player.height / 2 > a.y - a.height / 2
         ) {
             asteroids = []
-            startGame();
+            endGame()
         }
     }
+}
+
+
+function getScore(milliseconds) {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+
+    const millisecondsFormatted = String(milliseconds % 1000).padStart(3, '0');
+    const minutesFormatted = String(minutes).padStart(2, '0');
+    const secondsFormatted = String(seconds).padStart(2, '0');
+
+    return `${(minutesFormatted)}:${secondsFormatted}:${millisecondsFormatted}`
+}
+
+
+function drawScores() {
+    var ctx = myGameArea.context;
+    ctx.font = "20px Georgia";
+
+    ctx.fillText(`Vrijme: ${(getScore(Date.now() - startTimestamp))}`, windowWidth - 200, 50)
+    ctx.fillText(`Vrijme: ${(getScore(localStorage.highScore))}`, windowWidth - 200, 80)
+}
+
+
+function endGame() {
+    if (Date.now() - startTimestamp > localStorage.highScore) {
+        localStorage.highScore = Date.now() - startTimestamp
+    }
+
+    startGame();
 }
 
 
@@ -198,6 +256,7 @@ function updateGameArea() {
     spawnAsteroids();
     player.newPos();
     player.update();
+    drawScores();
 
     for (let a of asteroids) {
         if (new Date().getTime() - a.createdAt > asteroidLifeSpan) {
