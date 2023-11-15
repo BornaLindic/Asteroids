@@ -1,0 +1,20 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        title Asteroidi
+        style(type="text/css").
+            canvas {
+                border: 1px solid #000000;
+                background-color: #f1f1f1;
+            }
+        script(type='text/javascript', src='igrica.js')
+
+    body(onload="mainMenuScreen()")
+        p
+        |pocetniBrojAsteroida:
+        input(type="text", id="pocetniBrojAsteroida", value="5")
+        | frekvenicijaAsteroidaMilisekunde:
+        input(input type="text", id="frekvenicijaAsteroida", value="1000")
+        | 

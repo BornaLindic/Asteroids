@@ -1,13 +1,13 @@
 var gameActive = false
-var player;
-var startTimestamp = new Date()
+var myPlayer;
+var startTimestamp
 var asteroids
 var startNumAsteroids;
 var asteroidFrequency;
 const asteroidLifeSpan = 30_000;
 var lastAsteroidSpawn = new Date().getTime();
 var windowWidth = window.innerWidth-30
-var windowHeight = window.innerHeight-50
+var windowHeight = window.innerHeight-60
 
 if (!localStorage.highScore) {
     localStorage.highScore = 0
@@ -16,7 +16,6 @@ if (!localStorage.highScore) {
 // Keyboard input handling
 var keyState;
 window.addEventListener("keydown", (e) => {
-    console.log(e.key)
     if (e.key == "ArrowUp" ||
             e.key == "ArrowDown" ||
             e.key == "ArrowRight" ||
@@ -46,8 +45,11 @@ function startGame() {
     for (let i = 0; i < startNumAsteroids; i++) {
         asteroids.push(new asteroid)
     }
+
+    startTimestamp = new Date()
+
     myGameArea.context.clearRect(0, 0, myGameArea.canvas.width, myGameArea.canvas.height);
-    player = new player(30, 30, "red", windowWidth/2, windowHeight/2);
+    myPlayer = new player(30, 30, "red", windowWidth/2, windowHeight/2);
     myGameArea.start();
 }
 
@@ -206,10 +208,10 @@ function spawnAsteroids() {
 function checkCollisions() {
     for (const a of asteroids) {
         if (
-            player.x - player.width / 2 < a.x + a.width / 2 &&
-            player.x + player.width / 2 > a.x - a.width / 2&&
-            player.y - player.height / 2 < a.y + a.height / 2 &&
-            player.y + player.height / 2 > a.y - a.height / 2
+            myPlayer.x - myPlayer.width / 2 < a.x + a.width / 2 &&
+            myPlayer.x + myPlayer.width / 2 > a.x - a.width / 2&&
+            myPlayer.y - myPlayer.height / 2 < a.y + a.height / 2 &&
+            myPlayer.y + myPlayer.height / 2 > a.y - a.height / 2
         ) {
             asteroids = []
             endGame()
@@ -235,8 +237,8 @@ function drawScores() {
     var ctx = myGameArea.context;
     ctx.font = "20px Georgia";
 
-    ctx.fillText(`Vrijme: ${(getScore(Date.now() - startTimestamp))}`, windowWidth - 200, 50)
-    ctx.fillText(`Vrijme: ${(getScore(localStorage.highScore))}`, windowWidth - 200, 80)
+    ctx.fillText(`Vrijeme: ${(getScore(Date.now() - startTimestamp))}`, windowWidth - 300, 50)
+    ctx.fillText(`Najbolje vrijeme: ${(getScore(localStorage.highScore))}`, windowWidth - 300, 80)
 }
 
 
@@ -254,8 +256,8 @@ function updateGameArea() {
 
     myGameArea.clear();
     spawnAsteroids();
-    player.newPos();
-    player.update();
+    myPlayer.newPos();
+    myPlayer.update();
     drawScores();
 
     for (let a of asteroids) {
