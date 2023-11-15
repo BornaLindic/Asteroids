@@ -1,9 +1,9 @@
 {
   "scripts": {
-    "build": "npm run clean && tsc && npm run copy-views && npm run copy-scripts",
-    "clean": "if exist dist rmdir /s /q dist",
-    "copy-views": "robocopy /mir /NFL /NDL /NJH /NJS /nc /ns /np src/views/ dist/views & exit 0",
-    "copy-scripts": "robocopy /mir /NFL /NDL /NJH /NJS /nc /ns /np src/scripts/ dist/scripts & exit 0",
+    "build": "npm run clean; tsc; npm run copy-views; npm run copy-scripts",
+    "clean": "rm -rf dist",
+    "copy-views": "cp -r src/views/ dist/views & exit 0",
+    "copy-scripts": "cp -r src/scripts/ dist/scripts & exit 0",
     "start": "node dist/server.js"
   },
   "dependencies": {
