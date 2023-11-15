@@ -33,7 +33,7 @@ function mainMenuScreen() {
     myGameArea.setCanvas();
     ctx = myGameArea.context;
     ctx.font = "20px Georgia";
-    ctx.fillText("Za pokretanje igre pritisnike neku od strelica.", windowWidth/2-200, windowHeight/2)
+    ctx.fillText("Za pokretanje igre pritisnite neku od strelica.", windowWidth/2-200, windowHeight/2)
 }
 
 
